@@ -1,21 +1,21 @@
 [
   {
-    "id": "6afcaaf4-5af5-4b6d-a9a7-ec04e11fbcf2",
+    "id": "5f1693aa-7544-46c8-957b-73a0fbf632d9",
     "firstName": "Pavel",
     "lastName": "Medek",
     "email": "medek41@gmail.com",
-    "password": "fc09520a78ffded7ba761b4f2c8eb454:5735af712470dc60cfacaf47b00a9e29a0c67c4496e4e6baff20728361fa18807ae35279fa9192acff04fbf7bff4116f308502ed4ef9a231c52dcbdc15ed710f",
+    "password": "16653790d3907776d5e6b6cce69fc3d4:6c056080dfcb68f1a761dafd7ea5697682a66bfaaadbe9affc4330d7331af3899785bbc08adac4c09fe49e3eb00d2a6a43cdffdae0093e998a8c6b92cc0ba3a8",
     "plan": "free",
     "paid": false,
     "profileCompleted": true,
     "username": "Pavel",
-    "avatar": "https://api.dicebear.com/9.x/adventurer/svg?seed=Nova",
+    "avatar": "https://api.dicebear.com/9.x/adventurer/svg?seed=Atlas",
     "favoriteShows": [
       "stranger-things",
       "game-of-thrones",
-      "the-boys"
+      "chernobyl"
     ],
     "card": null,
-    "createdAt": "2026-03-09T05:09:07.777Z"
+    "createdAt": "2026-03-09T09:23:51.823Z"
   }
 ]
