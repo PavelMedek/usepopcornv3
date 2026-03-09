@@ -1,0 +1,199 @@
+import { NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+import { randomBytes, scryptSync } from "crypto";
+
+const filePath = path.join(process.cwd(), "data", "users.json");
+
+type StoredUser = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  plan: "free" | "plus" | "premium" | "payg";
+  paid: boolean;
+  profileCompleted: boolean;
+  username: string | null;
+  avatar: string | null;
+  favoriteShows: string[];
+  card: {
+    cardName: string;
+    cardNumber: string;
+    expiry: string;
+    cvc: string;
+  } | null;
+  createdAt: string;
+};
+
+async function readUsers(): Promise<StoredUser[]> {
+  try {
+    const file = await fs.readFile(filePath, "utf8");
+    return JSON.parse(file);
+  } catch {
+    return [];
+  }
+}
+
+async function writeUsers(users: StoredUser[]) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, JSON.stringify(users, null, 2), "utf8");
+}
+
+function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const hashed = scryptSync(password, salt, 64).toString("hex");
+
+  return `${salt}:${hashed}`;
+}
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+
+    const users = await readUsers();
+
+    const existingUser = users.find(
+      (user) => user.email.toLowerCase() === body.email.toLowerCase(),
+    );
+
+    if (existingUser) {
+      return NextResponse.json(
+        { message: "Uživatel s tímto e-mailem už existuje." },
+        { status: 409 },
+      );
+    }
+
+    const hashedPassword = hashPassword(body.password);
+
+    const newUser: StoredUser = {
+      id: crypto.randomUUID(),
+      firstName: body.firstName,
+      lastName: body.lastName,
+      email: body.email,
+      password: hashedPassword,
+      plan: body.plan,
+      paid: body.paid,
+      profileCompleted: body.profileCompleted,
+      username: body.username,
+      avatar: body.avatar,
+      favoriteShows: body.favoriteShows ?? [],
+      card: body.card ?? null,
+      createdAt: new Date().toISOString(),
+    };
+
+    users.push(newUser);
+    await writeUsers(users);
+
+    return NextResponse.json(
+      {
+        message: "Uživatel vytvořen.",
+        user: {
+          id: newUser.id,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          email: newUser.email,
+          plan: newUser.plan,
+          paid: newUser.paid,
+          profileCompleted: newUser.profileCompleted,
+          username: newUser.username,
+          avatar: newUser.avatar,
+          favoriteShows: newUser.favoriteShows,
+          createdAt: newUser.createdAt,
+        },
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    console.error("POST /api/users error:", error);
+
+    return NextResponse.json(
+      { message: "Nepodařilo se vytvořit uživatele." },
+      { status: 500 },
+    );
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const body = await req.json();
+
+    const { id, username, avatar, favoriteShows } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Chybí id uživatele." },
+        { status: 400 },
+      );
+    }
+
+    if (!username || String(username).trim().length < 3) {
+      return NextResponse.json(
+        { message: "Název profilu musí mít alespoň 3 znaky." },
+        { status: 400 },
+      );
+    }
+
+    if (!avatar) {
+      return NextResponse.json(
+        { message: "Musíš vybrat profilový obrázek." },
+        { status: 400 },
+      );
+    }
+
+    if (!Array.isArray(favoriteShows) || favoriteShows.length < 3) {
+      return NextResponse.json(
+        { message: "Vyber alespoň 3 oblíbené seriály." },
+        { status: 400 },
+      );
+    }
+
+    const users = await readUsers();
+    const userIndex = users.findIndex((user) => user.id === id);
+
+    if (userIndex === -1) {
+      return NextResponse.json(
+        { message: "Uživatel nebyl nalezen." },
+        { status: 404 },
+      );
+    }
+
+    const updatedUser: StoredUser = {
+      ...users[userIndex],
+      username: String(username).trim(),
+      avatar,
+      favoriteShows,
+      profileCompleted: true,
+    };
+
+    users[userIndex] = updatedUser;
+    await writeUsers(users);
+
+    return NextResponse.json(
+      {
+        message: "Profil byl úspěšně aktualizován.",
+        user: {
+          id: updatedUser.id,
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+          email: updatedUser.email,
+          plan: updatedUser.plan,
+          paid: updatedUser.paid,
+          profileCompleted: updatedUser.profileCompleted,
+          username: updatedUser.username,
+          avatar: updatedUser.avatar,
+          favoriteShows: updatedUser.favoriteShows,
+          createdAt: updatedUser.createdAt,
+        },
+      },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("PATCH /api/users/profile error:", error);
+
+    return NextResponse.json(
+      { message: "Nepodařilo se uložit profil." },
+      { status: 500 },
+    );
+  }
+}
