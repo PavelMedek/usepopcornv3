@@ -133,7 +133,7 @@ function buildUserObject(
   };
 }
 
-export default function SignupPage() {
+export default function SignupPageClient() {
   const [submitted, setSubmitted] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<

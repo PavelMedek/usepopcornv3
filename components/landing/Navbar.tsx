@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ButtonLink from "./ui/ButtonLink";
 import Container from "./ui/Container";
 import { landing } from "./styles";
+import { createClient } from "@/lib/supabase/client";
 
 type NavItem = { label: string; href: string };
 
@@ -23,6 +24,7 @@ export default function Navbar() {
   const [active, setActive] = useState(nav[0]?.href ?? "#catalog");
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -39,6 +41,30 @@ export default function Navbar() {
       document.body.style.overflow = prev;
     };
   }, [mobileOpen]);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setIsLoggedIn(!!user);
+    };
+
+    checkUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const go = (href: string) => {
     setActive(href);
@@ -97,8 +123,8 @@ export default function Navbar() {
 
             <div className="flex items-center gap-2">
               <div className="hidden sm:block">
-                <ButtonLink href="/signup" arrow>
-                  Začít zdarma
+                <ButtonLink href={isLoggedIn ? "/home" : "/login"} arrow>
+                  {isLoggedIn ? "Otevřít aplikaci" : "Přihlásit se"}
                 </ButtonLink>
               </div>
 
@@ -168,13 +194,13 @@ export default function Navbar() {
 
                 <div className="mt-4">
                   <ButtonLink
-                    href="/signup"
+                    href={isLoggedIn ? "/home" : "/signup"}
                     block
                     rounded="2xl"
                     arrow
                     onClick={() => setMobileOpen(false)}
                   >
-                    Začít zdarma
+                    {isLoggedIn ? "Otevřít aplikaci" : "Začít zdarma"}
                   </ButtonLink>
                 </div>
 

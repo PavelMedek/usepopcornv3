@@ -198,7 +198,7 @@ export default function ProfileSetupPage() {
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));
       setUser(updatedUser);
 
-      router.push("/");
+      router.push("/home");
     } catch (error) {
       console.error("Profile setup error:", error);
       setSubmitError(
@@ -213,7 +213,7 @@ export default function ProfileSetupPage() {
 
   const onSkip = async () => {
     if (!user) {
-      router.push("/");
+      router.push("/home");
       return;
     }
 
@@ -254,7 +254,7 @@ export default function ProfileSetupPage() {
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));
       setUser(updatedUser);
 
-      router.push("/");
+      router.push("/home");
     } catch (error) {
       console.error("Skip profile setup error:", error);
       setSubmitError(
