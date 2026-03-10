@@ -7,7 +7,16 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import {
+  Loader2,
+  Mail,
+  LockKeyhole,
+  Clapperboard,
+  Sparkles,
+  PlayCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const loginSchema = z.object({
@@ -25,6 +34,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -105,100 +115,133 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-50 lg:h-screen lg:overflow-hidden">
       <div className="grid min-h-screen lg:h-screen lg:grid-cols-2">
-        <section className="relative min-h-screen overflow-y-auto lg:h-screen">
+        <section className="relative min-h-screen overflow-y-auto border-r border-white/10 lg:h-screen">
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute left-[-120px] top-[10%] h-72 w-72 rounded-full bg-amber-400/10 blur-3xl" />
             <div className="absolute right-[-120px] top-[20%] h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl" />
             <div className="absolute bottom-[-160px] left-[30%] h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl" />
           </div>
 
-          <div className="relative z-10 flex min-h-screen items-start justify-center px-4 py-8 sm:px-6 lg:min-h-full lg:px-10 lg:py-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-xl rounded-[32px] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur md:p-8"
+          <div className="relative z-10 flex h-full flex-col justify-between p-10">
+            <Link
+              href="/"
+              className="w-fit text-lg font-semibold tracking-tight"
             >
-              <div className="mb-8">
-                <Link href="/" className="text-lg font-semibold tracking-tight">
-                  use<span className="text-amber-400">Popcorn</span>
-                </Link>
+              use<span className="text-amber-400">Popcorn</span>
+            </Link>
 
-                <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-                  Přihlásit se
-                </h1>
-                <p className="mt-2 text-sm text-zinc-300">
-                  Přihlas se ke svému účtu a pokračuj do usePopcorn.
-                </p>
-              </div>
-
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-5"
+            <div className="flex flex-1 items-center justify-center py-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full max-w-xl rounded-[32px] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur md:p-8"
               >
-                <Field
-                  label="E-mail"
-                  error={form.formState.errors.email?.message}
+                <div className="mb-8">
+                  <h1 className="text-3xl font-semibold tracking-tight">
+                    Přihlásit se
+                  </h1>
+                  <p className="mt-2 text-sm text-zinc-300">
+                    Přihlas se ke svému účtu a pokračuj do usePopcorn.
+                  </p>
+                </div>
+
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-5"
                 >
-                  <input
-                    {...form.register("email")}
-                    type="email"
-                    placeholder="jan@usepopcorn.app"
-                    className={inputClass(!!form.formState.errors.email)}
-                    disabled={loading}
-                  />
-                </Field>
-
-                <Field
-                  label="Heslo"
-                  error={form.formState.errors.password?.message}
-                >
-                  <input
-                    {...form.register("password")}
-                    type="password"
-                    placeholder="••••••••"
-                    className={inputClass(!!form.formState.errors.password)}
-                    disabled={loading}
-                  />
-                </Field>
-
-                {submitError && (
-                  <div className="rounded-2xl border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-200">
-                    {submitError}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-400 px-5 py-3.5 text-sm font-medium text-zinc-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {loading ? (
-                    <>
-                      Přihlašuji <Loader2 className="animate-spin" size={16} />
-                    </>
-                  ) : (
-                    <>
-                      Přihlásit se <span>→</span>
-                    </>
-                  )}
-                </button>
-
-                <p className="text-center text-sm text-zinc-400">
-                  Ještě nemáš účet?{" "}
-                  <Link
-                    href="/signup"
-                    className="text-zinc-100 hover:text-amber-300"
+                  <Field
+                    label="E-mail"
+                    icon={<Mail size={18} />}
+                    error={form.formState.errors.email?.message}
                   >
-                    Vytvořit účet
-                  </Link>
-                </p>
-              </form>
-            </motion.div>
+                    <input
+                      {...form.register("email")}
+                      type="email"
+                      placeholder="jan@usepopcorn.app"
+                      className={inputClass(
+                        !!form.formState.errors.email,
+                        false,
+                        false,
+                      )}
+                      disabled={loading}
+                    />
+                  </Field>
+
+                  <Field
+                    label="Heslo"
+                    icon={<LockKeyhole size={18} />}
+                    error={form.formState.errors.password?.message}
+                  >
+                    <div className="relative">
+                      <input
+                        {...form.register("password")}
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className={inputClass(
+                          !!form.formState.errors.password,
+                          false,
+                          true,
+                        )}
+                        disabled={loading}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="absolute inset-y-0 right-0 inline-flex items-center justify-center px-4 text-zinc-400 transition hover:text-zinc-200"
+                        aria-label={
+                          showPassword ? "Skrýt heslo" : "Zobrazit heslo"
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </Field>
+
+                  {submitError && (
+                    <div className="rounded-2xl border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-200">
+                      {submitError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-400 px-5 py-3.5 text-sm font-medium text-zinc-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {loading ? (
+                      <>
+                        Přihlašuji{" "}
+                        <Loader2 className="animate-spin" size={16} />
+                      </>
+                    ) : (
+                      <>
+                        Přihlásit se <span>→</span>
+                      </>
+                    )}
+                  </button>
+
+                  <p className="text-center text-sm text-zinc-400">
+                    Ještě nemáš účet?{" "}
+                    <Link
+                      href="/signup"
+                      className="text-zinc-100 hover:text-amber-300"
+                    >
+                      Vytvořit účet
+                    </Link>
+                  </p>
+                </form>
+              </motion.div>
+            </div>
           </div>
         </section>
 
-        <section className="relative hidden h-screen overflow-hidden border-l border-white/10 lg:block">
+        <section className="relative hidden h-screen overflow-hidden lg:block">
           <div className="absolute inset-0">
             <div className="grid h-full grid-cols-3 gap-3 p-6 opacity-70">
               {posters.map((poster, i) => (
@@ -229,7 +272,8 @@ export default function LoginPage() {
 
             <div className="max-w-xl self-end text-right">
               <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-200">
-                🍿 Tvoje streamovací platforma na míru
+                <Clapperboard size={14} />
+                Tvoje streamovací platforma na míru
               </p>
 
               <h2 className="mt-5 text-4xl font-semibold leading-tight tracking-tight">
@@ -240,6 +284,17 @@ export default function LoginPage() {
                 Pokračuj ve sledování, objevuj nové tituly a měj všechno
                 přehledně na jednom místě.
               </p>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-zinc-200">
+                  <Sparkles size={16} className="text-amber-300" />
+                  Pokračování ve sledování
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-zinc-200">
+                  <PlayCircle size={16} className="text-emerald-300" />
+                  Oblíbené seriály
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -251,26 +306,35 @@ export default function LoginPage() {
 function Field({
   label,
   error,
+  icon,
   children,
 }: {
   label: string;
   error?: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-zinc-200">
+      <label className="mb-2 flex items-center gap-2 text-sm font-medium text-zinc-200">
+        {icon && <span className="text-zinc-400">{icon}</span>}
         {label}
       </label>
-      {children}
+      <div className="relative">{children}</div>
       {error && <p className="mt-2 text-sm text-rose-300">{error}</p>}
     </div>
   );
 }
 
-function inputClass(hasError?: boolean) {
+function inputClass(
+  hasError?: boolean,
+  withLeftIcon?: boolean,
+  withRightIcon?: boolean,
+) {
   return [
-    "w-full rounded-2xl border bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 outline-none transition",
+    "w-full rounded-2xl border bg-zinc-950/40 py-3 text-sm text-zinc-100 outline-none transition",
+    withLeftIcon ? "pl-11" : "pl-4",
+    withRightIcon ? "pr-12" : "pr-4",
     "placeholder:text-zinc-500",
     "focus:border-amber-400/50 focus:bg-zinc-950/60",
     hasError ? "border-rose-400/40" : "border-white/10",

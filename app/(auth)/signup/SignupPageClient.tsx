@@ -8,7 +8,19 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Check, Loader2, X } from "lucide-react";
+import {
+  Check,
+  CreditCard,
+  Eye,
+  EyeOff,
+  Loader2,
+  LockKeyhole,
+  Mail,
+  User,
+  UserRound,
+  WalletCards,
+  X,
+} from "lucide-react";
 import PlanSelect, { PlanOption } from "@/components/auth/PlanSelect";
 
 const planOptions: PlanOption[] = [
@@ -142,6 +154,8 @@ export default function SignupPageClient() {
   const [pendingSignupData, setPendingSignupData] =
     useState<SignupFormValues | null>(null);
   const [submitError, setSubmitError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -165,7 +179,7 @@ export default function SignupPageClient() {
       password: "",
       confirmPassword: "",
       plan: initialPlan,
-      terms: true,
+      terms: false,
     },
     mode: "onBlur",
   });
@@ -220,8 +234,6 @@ export default function SignupPageClient() {
       localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
       router.push("/signup/profile");
-
-      // router.push("/");
     } catch (error) {
       console.error("Signup error:", error);
       setSubmitError(
@@ -363,6 +375,7 @@ export default function SignupPageClient() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field
                       label="Jméno"
+                      icon={<User size={18} />}
                       error={form.formState.errors.firstName?.message}
                     >
                       <input
@@ -377,6 +390,7 @@ export default function SignupPageClient() {
 
                     <Field
                       label="Příjmení"
+                      icon={<UserRound size={18} />}
                       error={form.formState.errors.lastName?.message}
                     >
                       <input
@@ -390,6 +404,7 @@ export default function SignupPageClient() {
 
                   <Field
                     label="E-mail"
+                    icon={<Mail size={18} />}
                     error={form.formState.errors.email?.message}
                   >
                     <input
@@ -403,33 +418,76 @@ export default function SignupPageClient() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field
                       label="Heslo"
+                      icon={<LockKeyhole size={18} />}
                       error={form.formState.errors.password?.message}
                     >
-                      <input
-                        {...form.register("password")}
-                        type="password"
-                        placeholder="••••••••"
-                        className={inputClass(!!form.formState.errors.password)}
-                      />
+                      <div className="relative">
+                        <input
+                          {...form.register("password")}
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          className={inputClass(
+                            !!form.formState.errors.password,
+                            true,
+                          )}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute inset-y-0 right-0 inline-flex items-center justify-center px-4 text-zinc-400 transition hover:text-zinc-200"
+                          aria-label={
+                            showPassword ? "Skrýt heslo" : "Zobrazit heslo"
+                          }
+                        >
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      </div>
                     </Field>
 
                     <Field
                       label="Potvrzení hesla"
+                      icon={<LockKeyhole size={18} />}
                       error={form.formState.errors.confirmPassword?.message}
                     >
-                      <input
-                        {...form.register("confirmPassword")}
-                        type="password"
-                        placeholder="••••••••"
-                        className={inputClass(
-                          !!form.formState.errors.confirmPassword,
-                        )}
-                      />
+                      <div className="relative">
+                        <input
+                          {...form.register("confirmPassword")}
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          className={inputClass(
+                            !!form.formState.errors.confirmPassword,
+                            true,
+                          )}
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword((prev) => !prev)
+                          }
+                          className="absolute inset-y-0 right-0 inline-flex items-center justify-center px-4 text-zinc-400 transition hover:text-zinc-200"
+                          aria-label={
+                            showConfirmPassword
+                              ? "Skrýt potvrzení hesla"
+                              : "Zobrazit potvrzení hesla"
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      </div>
                     </Field>
                   </div>
 
                   <Field
                     label="Vybraný plán"
+                    icon={<WalletCards size={18} />}
                     error={form.formState.errors.plan?.message}
                   >
                     <Controller
@@ -563,6 +621,7 @@ export default function SignupPageClient() {
                   >
                     <Field
                       label="Jméno na kartě"
+                      icon={<User size={18} />}
                       error={cardForm.formState.errors.cardName?.message}
                     >
                       <input
@@ -577,6 +636,7 @@ export default function SignupPageClient() {
 
                     <Field
                       label="Číslo karty"
+                      icon={<CreditCard size={18} />}
                       error={cardForm.formState.errors.cardNumber?.message}
                     >
                       <input
@@ -592,6 +652,7 @@ export default function SignupPageClient() {
                     <div className="grid gap-4 sm:grid-cols-2">
                       <Field
                         label="Platnost"
+                        icon={<CreditCard size={18} />}
                         error={cardForm.formState.errors.expiry?.message}
                       >
                         <input
@@ -606,6 +667,7 @@ export default function SignupPageClient() {
 
                       <Field
                         label="CVC"
+                        icon={<LockKeyhole size={18} />}
                         error={cardForm.formState.errors.cvc?.message}
                       >
                         <input
@@ -672,15 +734,18 @@ export default function SignupPageClient() {
 function Field({
   label,
   error,
+  icon,
   children,
 }: {
   label: string;
   error?: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-zinc-200">
+      <label className="mb-2 flex items-center gap-2 text-sm font-medium text-zinc-200">
+        {icon && <span className="text-zinc-400">{icon}</span>}
         {label}
       </label>
       {children}
@@ -689,9 +754,10 @@ function Field({
   );
 }
 
-function inputClass(hasError?: boolean) {
+function inputClass(hasError?: boolean, withRightIcon?: boolean) {
   return [
     "w-full rounded-2xl border bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 outline-none transition",
+    withRightIcon ? "pr-12" : "",
     "placeholder:text-zinc-500",
     "focus:border-amber-400/50 focus:bg-zinc-950/60",
     hasError ? "border-rose-400/40" : "border-white/10",
