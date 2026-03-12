@@ -1,12 +1,73 @@
 import type { PlanOption } from "@/components/auth/PlanSelect";
 
-export const loginPosters = Array.from({ length: 12 }).map((_, i) => ({
-  src: `https://picsum.photos/seed/login-${i}/600/900`,
-}));
+export type Poster = {
+  src: string;
+  title: string;
+};
 
-export const signupPosters = Array.from({ length: 12 }).map((_, i) => ({
-  src: `https://picsum.photos/seed/signup-${i}/600/900`,
-}));
+const loginShowIds = [
+  82, // Game of Thrones
+  169, // Breaking Bad
+  305, // Sherlock
+  216, // The Walking Dead
+  527, // House
+  49, // Vikings
+  179, // Suits
+  2993, // Stranger Things
+  1371, // The 100
+  66, // The Big Bang Theory
+  431, // Friends
+  66732, // Wednesday
+];
+
+const signupShowIds = [
+  431, // Friends
+  2993, // Stranger Things
+  66732, // Wednesday
+  66, // The Big Bang Theory
+  179, // Suits
+  305, // Sherlock
+  527, // House
+  82, // Game of Thrones
+  169, // Breaking Bad
+  49, // Vikings
+  216, // The Walking Dead
+  1371, // The 100
+];
+
+async function fetchPosters(ids: number[]): Promise<Poster[]> {
+  const results = await Promise.all(
+    ids.map(async (id) => {
+      try {
+        const res = await fetch(`https://api.tvmaze.com/shows/${id}`);
+
+        if (!res.ok) return null;
+
+        const data = await res.json();
+
+        const src = data?.image?.original || data?.image?.medium;
+        if (!src) return null;
+
+        return {
+          src,
+          title: data.name ?? "Seriál",
+        };
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return results.filter((item): item is Poster => item !== null);
+}
+
+export async function getLoginPosters() {
+  return fetchPosters(loginShowIds);
+}
+
+export async function getSignupPosters() {
+  return fetchPosters(signupShowIds);
+}
 
 export const planOptions: PlanOption[] = [
   {

@@ -1,5 +1,12 @@
 export type Plan = "free" | "plus" | "premium" | "payg";
 
+export type MockCard = {
+  cardName: string;
+  cardNumber: string;
+  expiry: string;
+  cvc: string;
+};
+
 export type CreatedUser = {
   firstName: string;
   lastName: string;
@@ -23,7 +30,7 @@ export type CurrentUser = {
   id: string;
   firstName: string;
   lastName: string;
-  email: string;
+  email: string | null;
   plan: Plan;
   paid: boolean;
   profileCompleted: boolean;
@@ -31,6 +38,7 @@ export type CurrentUser = {
   avatar: string | null;
   favoriteShows: string[];
   createdAt: string;
+  mockCard: MockCard | null;
 };
 
 export type ProfileRecord = {
@@ -44,4 +52,5 @@ export type ProfileRecord = {
   avatar: string | null;
   favorite_shows: string[] | null;
   created_at: string;
+  mock_card: MockCard | null;
 };

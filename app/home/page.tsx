@@ -3,6 +3,13 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "./LogoutButton";
 
+type MockCard = {
+  cardName: string;
+  cardNumber: string;
+  expiry: string;
+  cvc: string;
+};
+
 type ProfileRow = {
   id: string;
   first_name: string | null;
@@ -14,6 +21,7 @@ type ProfileRow = {
   paid: boolean | null;
   profile_completed: boolean | null;
   created_at: string | null;
+  mock_card: MockCard | null;
 };
 
 export default async function HomePage() {
@@ -37,7 +45,7 @@ export default async function HomePage() {
   const typedProfile = profile as ProfileRow | null;
 
   if (profileError || !typedProfile) {
-    redirect("/profile-setup");
+    redirect("/signup/profile");
   }
 
   const displayName =
@@ -156,6 +164,32 @@ export default async function HomePage() {
               ) : (
                 <p className="mt-4 text-sm text-zinc-400">
                   Zatím nemáš vybrané žádné oblíbené seriály.
+                </p>
+              )}
+            </div>
+
+            <div className="mt-8">
+              <h3 className="text-lg font-medium">Uložená platební karta</h3>
+
+              {typedProfile.mock_card ? (
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <InfoCard
+                    label="Jméno na kartě"
+                    value={typedProfile.mock_card.cardName}
+                  />
+                  <InfoCard
+                    label="Číslo karty"
+                    value={typedProfile.mock_card.cardNumber}
+                  />
+                  <InfoCard
+                    label="Platnost"
+                    value={typedProfile.mock_card.expiry}
+                  />
+                  <InfoCard label="CVC" value={typedProfile.mock_card.cvc} />
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-zinc-400">
+                  Pro tento účet není uložená žádná platební karta.
                 </p>
               )}
             </div>

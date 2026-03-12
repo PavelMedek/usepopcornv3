@@ -18,7 +18,8 @@ import PasswordInput from "@/components/auth/PasswordInput";
 import SubmitButton from "@/components/auth/SubmitButton";
 import AuthErrorAlert from "@/components/auth/AuthErrorAlert";
 import AuthLoadingOverlay from "@/components/auth/AuthLoadingOverlay";
-import { loginPosters } from "@/features/auth/constants";
+// import { loginPosters } from "@/features/auth/constants";
+import { useAuthPosters } from "@/features/auth/hooks/useAuthPosters";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 
 export default function LoginPageClient() {
@@ -30,6 +31,8 @@ export default function LoginPageClient() {
     loadingTitle,
     loadingDescription,
   } = useLogin();
+
+  const { posters: loginPosters } = useAuthPosters("login");
 
   return (
     <AuthShell

@@ -785,7 +785,8 @@ import AuthErrorAlert from "@/components/auth/AuthErrorAlert";
 import TermsCheckbox from "@/components/auth/TermsCheckbox";
 import PaymentDialog from "@/components/auth/PaymentDialog";
 import AuthLoadingOverlay from "@/components/auth/AuthLoadingOverlay";
-import { signupPosters, planOptions } from "@/features/auth/constants";
+import { planOptions } from "@/features/auth/constants";
+import { useAuthPosters } from "@/features/auth/hooks/useAuthPosters";
 import { useSignup } from "@/features/auth/hooks/useSignup";
 
 export default function SignupPageClient() {
@@ -806,6 +807,8 @@ export default function SignupPageClient() {
     loadingTitle,
     loadingDescription,
   } = useSignup();
+
+  const { posters: signupPosters } = useAuthPosters("login");
 
   const isFormLocked = isBusy && !paymentOpen;
   const isPrimaryButtonLoading =

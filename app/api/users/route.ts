@@ -197,30 +197,285 @@
 //     );
 //   }
 // }
+// import { NextResponse } from "next/server";
+// import { createClient } from "@/lib/supabase/server";
+
+// type Plan = "free" | "plus" | "premium" | "payg";
+
+// export async function POST(req: Request) {
+//   try {
+//     const body = await req.json();
+
+//     const {
+//       firstName,
+//       lastName,
+//       email,
+//       password,
+//       plan,
+//       paid,
+//     }: {
+//       firstName: string;
+//       lastName: string;
+//       email: string;
+//       password: string;
+//       plan: Plan;
+//       paid: boolean;
+//     } = body;
+
+//     const supabase = await createClient();
+
+//     const { data, error } = await supabase.auth.signUp({
+//       email,
+//       password,
+//     });
+
+//     if (error) {
+//       return NextResponse.json({ message: error.message }, { status: 400 });
+//     }
+
+//     const user = data.user;
+
+//     if (!user) {
+//       return NextResponse.json(
+//         { message: "Uživatel nebyl vytvořen." },
+//         { status: 400 },
+//       );
+//     }
+
+//     const { error: profileError } = await supabase.from("profiles").insert({
+//       id: user.id,
+//       first_name: firstName,
+//       last_name: lastName,
+//       username: null,
+//       avatar: null,
+//       favorite_shows: [],
+//       plan,
+//       paid,
+//       profile_completed: false,
+//     });
+
+//     if (profileError) {
+//       return NextResponse.json(
+//         { message: profileError.message },
+//         { status: 400 },
+//       );
+//     }
+
+//     return NextResponse.json(
+//       {
+//         message: "Uživatel vytvořen.",
+//         user: {
+//           id: user.id,
+//           firstName,
+//           lastName,
+//           email: user.email,
+//           plan,
+//           paid,
+//           profileCompleted: false,
+//           username: null,
+//           avatar: null,
+//           favoriteShows: [],
+//         },
+//       },
+//       { status: 201 },
+//     );
+//   } catch (error) {
+//     console.error("POST /api/users error:", error);
+
+//     return NextResponse.json(
+//       { message: "Nepodařilo se vytvořit uživatele." },
+//       { status: 500 },
+//     );
+//   }
+// }
+
+// export async function PATCH(req: Request) {
+//   try {
+//     const body = await req.json();
+
+//     const {
+//       id,
+//       username,
+//       avatar,
+//       favoriteShows,
+//     }: {
+//       id: string;
+//       username: string;
+//       avatar: string;
+//       favoriteShows: string[];
+//     } = body;
+
+//     if (!id) {
+//       return NextResponse.json(
+//         { message: "Chybí id uživatele." },
+//         { status: 400 },
+//       );
+//     }
+
+//     if (!username || username.trim().length < 3) {
+//       return NextResponse.json(
+//         { message: "Název profilu musí mít alespoň 3 znaky." },
+//         { status: 400 },
+//       );
+//     }
+
+//     if (!avatar) {
+//       return NextResponse.json(
+//         { message: "Musíš vybrat profilový obrázek." },
+//         { status: 400 },
+//       );
+//     }
+
+//     if (!Array.isArray(favoriteShows) || favoriteShows.length < 3) {
+//       return NextResponse.json(
+//         { message: "Vyber alespoň 3 oblíbené seriály." },
+//         { status: 400 },
+//       );
+//     }
+
+//     const supabase = await createClient();
+
+//     const { data, error } = await supabase
+//       .from("profiles")
+//       .update({
+//         username: username.trim(),
+//         avatar,
+//         favorite_shows: favoriteShows,
+//         profile_completed: true,
+//       })
+//       .eq("id", id)
+//       .select()
+//       .single();
+
+//     if (error) {
+//       return NextResponse.json({ message: error.message }, { status: 400 });
+//     }
+
+//     return NextResponse.json(
+//       {
+//         message: "Profil byl úspěšně aktualizován.",
+//         user: {
+//           id: data.id,
+//           firstName: data.first_name,
+//           lastName: data.last_name,
+//           email: null,
+//           plan: data.plan,
+//           paid: data.paid,
+//           profileCompleted: data.profile_completed,
+//           username: data.username,
+//           avatar: data.avatar,
+//           favoriteShows: data.favorite_shows ?? [],
+//           createdAt: data.created_at,
+//         },
+//       },
+//       { status: 200 },
+//     );
+//   } catch (error) {
+//     console.error("PATCH /api/users error:", error);
+
+//     return NextResponse.json(
+//       { message: "Nepodařilo se uložit profil." },
+//       { status: 500 },
+//     );
+//   }
+// }
+
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 type Plan = "free" | "plus" | "premium" | "payg";
 
+type MockCard = {
+  cardName: string;
+  cardNumber: string;
+  expiry: string;
+  cvc: string;
+};
+
+type CreateUserBody = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  plan: Plan;
+  paid: boolean;
+  card?: {
+    cardName?: string;
+    cardNumber?: string;
+    expiry?: string;
+    cvc?: string;
+  } | null;
+};
+
+type UpdateProfileBody = {
+  id: string;
+  username: string;
+  avatar: string;
+  favoriteShows: string[];
+};
+
+const MOCK_CARD_NAMES = [
+  "John Doe",
+  "Jane Smith",
+  "Alex Carter",
+  "Emily Johnson",
+  "Michael Brown",
+  "Olivia Davis",
+  "Daniel Wilson",
+  "Sophia Moore",
+];
+
+function isPaidPlan(plan: Plan) {
+  return plan === "plus" || plan === "premium";
+}
+
+function randomInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomDigits(length: number) {
+  return Array.from({ length }, () => randomInt(0, 9)).join("");
+}
+
+function formatCardNumber(raw: string) {
+  return raw.match(/.{1,4}/g)?.join(" ") ?? raw;
+}
+
+function generateMockExpiry() {
+  const month = String(randomInt(1, 12)).padStart(2, "0");
+  const year = String(randomInt(27, 32));
+  return `${month}/${year}`;
+}
+
+function generateMockCard(): MockCard {
+  const cardName =
+    MOCK_CARD_NAMES[randomInt(0, MOCK_CARD_NAMES.length - 1)] ?? "John Doe";
+
+  return {
+    cardName,
+    cardNumber: formatCardNumber(randomDigits(16)),
+    expiry: generateMockExpiry(),
+    cvc: randomDigits(3),
+  };
+}
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = (await req.json()) as CreateUserBody;
 
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      plan,
-      paid,
-    }: {
-      firstName: string;
-      lastName: string;
-      email: string;
-      password: string;
-      plan: Plan;
-      paid: boolean;
-    } = body;
+    const { firstName, lastName, email, password, plan, paid } = body;
+
+    if (
+      !firstName?.trim() ||
+      !lastName?.trim() ||
+      !email?.trim() ||
+      !password
+    ) {
+      return NextResponse.json(
+        { message: "Chybí povinné údaje pro registraci." },
+        { status: 400 },
+      );
+    }
 
     const supabase = await createClient();
 
@@ -242,6 +497,8 @@ export async function POST(req: Request) {
       );
     }
 
+    const mockCard = isPaidPlan(plan) ? generateMockCard() : null;
+
     const { error: profileError } = await supabase.from("profiles").insert({
       id: user.id,
       first_name: firstName,
@@ -252,6 +509,7 @@ export async function POST(req: Request) {
       plan,
       paid,
       profile_completed: false,
+      mock_card: mockCard,
     });
 
     if (profileError) {
@@ -275,6 +533,8 @@ export async function POST(req: Request) {
           username: null,
           avatar: null,
           favoriteShows: [],
+          createdAt: new Date().toISOString(),
+          mockCard,
         },
       },
       { status: 201 },
@@ -291,19 +551,9 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const body = await req.json();
+    const body = (await req.json()) as UpdateProfileBody;
 
-    const {
-      id,
-      username,
-      avatar,
-      favoriteShows,
-    }: {
-      id: string;
-      username: string;
-      avatar: string;
-      favoriteShows: string[];
-    } = body;
+    const { id, username, avatar, favoriteShows } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -366,6 +616,7 @@ export async function PATCH(req: Request) {
           avatar: data.avatar,
           favoriteShows: data.favorite_shows ?? [],
           createdAt: data.created_at,
+          mockCard: data.mock_card ?? null,
         },
       },
       { status: 200 },
