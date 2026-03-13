@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Clapperboard, Menu, X, ArrowRight } from "lucide-react";
 import ButtonLink from "./ui/ButtonLink";
 import Container from "./ui/Container";
 import { landing } from "./styles";
@@ -85,9 +86,12 @@ export default function Navbar() {
           <Container className="flex items-center justify-between py-4">
             <Link
               href="/"
-              className="text-sm font-semibold tracking-tight text-zinc-100 transition-colors hover:text-white"
+              className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight text-zinc-100 transition-colors hover:text-white"
             >
-              use<span className="text-amber-400">Popcorn</span>
+              <Clapperboard className="h-4 w-4 text-amber-400" />
+              <span>
+                use<span className="text-amber-400">Popcorn</span>
+              </span>
               <span className="ml-2 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-zinc-300">
                 beta
               </span>
@@ -133,7 +137,11 @@ export default function Navbar() {
                 onClick={() => setMobileOpen((v) => !v)}
                 aria-label="Open menu"
               >
-                <BurgerIcon open={mobileOpen} />
+                {mobileOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </button>
             </div>
           </Container>
@@ -172,7 +180,7 @@ export default function Navbar() {
                     className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
                     aria-label="Close"
                   >
-                    ✕
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
 
@@ -187,21 +195,45 @@ export default function Navbar() {
                       className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm hover:bg-white/10"
                     >
                       <span>{item.label}</span>
-                      <span className="text-zinc-400">→</span>
+                      <ArrowRight className="h-4 w-4 text-zinc-400" />
                     </motion.button>
                   ))}
                 </div>
 
-                <div className="mt-4">
-                  <ButtonLink
-                    href={isLoggedIn ? "/home" : "/signup"}
-                    block
-                    rounded="2xl"
-                    arrow
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {isLoggedIn ? "Otevřít aplikaci" : "Začít zdarma"}
-                  </ButtonLink>
+                <div className="mt-4 grid gap-3">
+                  {isLoggedIn ? (
+                    <ButtonLink
+                      href="/home"
+                      block
+                      rounded="2xl"
+                      arrow
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Otevřít aplikaci
+                    </ButtonLink>
+                  ) : (
+                    <>
+                      <ButtonLink
+                        href="/signup"
+                        block
+                        rounded="2xl"
+                        arrow
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        Začít zdarma
+                      </ButtonLink>
+
+                      <ButtonLink
+                        href="/login"
+                        block
+                        rounded="2xl"
+                        variant="secondary"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        Přihlásit se
+                      </ButtonLink>
+                    </>
+                  )}
                 </div>
 
                 <p className="mt-4 px-1 text-xs text-zinc-400">
@@ -213,27 +245,5 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </>
-  );
-}
-
-function BurgerIcon({ open }: { open: boolean }) {
-  return (
-    <span className="relative block h-4 w-5">
-      <motion.span
-        className="absolute left-0 top-0 h-[2px] w-full rounded bg-white"
-        animate={{ y: open ? 7 : 0, rotate: open ? 45 : 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 35 }}
-      />
-      <motion.span
-        className="absolute left-0 top-[7px] h-[2px] w-full rounded bg-white"
-        animate={{ opacity: open ? 0 : 1 }}
-        transition={{ duration: 0.15 }}
-      />
-      <motion.span
-        className="absolute left-0 top-[14px] h-[2px] w-full rounded bg-white"
-        animate={{ y: open ? -7 : 0, rotate: open ? -45 : 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 35 }}
-      />
-    </span>
   );
 }

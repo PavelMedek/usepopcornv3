@@ -62,5 +62,6 @@ export function mapProfileToCurrentUser(
     favoriteShows: profile.favorite_shows ?? [],
     createdAt: profile.created_at,
     mockCard: profile.mock_card ?? null,
+    role: profile.role,
   };
 }

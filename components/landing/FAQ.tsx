@@ -7,6 +7,7 @@ import {
   type Variants,
 } from "framer-motion";
 import { useState } from "react";
+import { HelpCircle, Plus, X } from "lucide-react";
 import Section from "./ui/Section";
 import SectionHeader from "./ui/SectionHeader";
 
@@ -122,24 +123,34 @@ export default function FAQ() {
                 onClick={() => setOpen(isOpen ? null : idx)}
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left md:px-6 md:py-5"
               >
-                <motion.span
-                  animate={
-                    reduce
-                      ? undefined
-                      : { opacity: isOpen ? 1 : 0.95, x: isOpen ? 2 : 0 }
-                  }
-                  transition={{ duration: 0.2 }}
-                  className="text-sm font-medium text-zinc-100 md:text-base"
-                >
-                  {item.q}
-                </motion.span>
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-300">
+                    <HelpCircle className="h-4 w-4" />
+                  </span>
+
+                  <motion.span
+                    animate={
+                      reduce
+                        ? undefined
+                        : { opacity: isOpen ? 1 : 0.95, x: isOpen ? 2 : 0 }
+                    }
+                    transition={{ duration: 0.2 }}
+                    className="text-sm font-medium text-zinc-100 md:text-base"
+                  >
+                    {item.q}
+                  </motion.span>
+                </div>
 
                 <motion.span
-                  animate={reduce ? undefined : { rotate: isOpen ? 45 : 0 }}
+                  animate={reduce ? undefined : { rotate: isOpen ? 180 : 0 }}
                   transition={{ duration: 0.22, ease: easeOut }}
-                  className="text-lg text-zinc-300"
+                  className="shrink-0 text-zinc-300"
                 >
-                  +
+                  {isOpen ? (
+                    <X className="h-5 w-5" />
+                  ) : (
+                    <Plus className="h-5 w-5" />
+                  )}
                 </motion.span>
               </button>
 

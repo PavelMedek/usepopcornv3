@@ -1,4 +1,5 @@
 export type Plan = "free" | "plus" | "premium" | "payg";
+export type Role = "admin" | "moderator" | "user";
 
 export type MockCard = {
   cardName: string;
@@ -39,6 +40,7 @@ export type CurrentUser = {
   favoriteShows: string[];
   createdAt: string;
   mockCard: MockCard | null;
+  role: Role;
 };
 
 export type ProfileRecord = {
@@ -53,4 +55,5 @@ export type ProfileRecord = {
   favorite_shows: string[] | null;
   created_at: string;
   mock_card: MockCard | null;
+  role: Role;
 };

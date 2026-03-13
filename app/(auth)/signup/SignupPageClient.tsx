@@ -808,7 +808,7 @@ export default function SignupPageClient() {
     loadingDescription,
   } = useSignup();
 
-  const { posters: signupPosters } = useAuthPosters("login");
+  const { posters: signupPosters } = useAuthPosters("signup");
 
   const isFormLocked = isBusy && !paymentOpen;
   const isPrimaryButtonLoading =

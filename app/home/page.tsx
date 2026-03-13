@@ -10,6 +10,8 @@ type MockCard = {
   cvc: string;
 };
 
+type Role = "admin" | "moderator" | "user";
+
 type ProfileRow = {
   id: string;
   first_name: string | null;
@@ -22,6 +24,7 @@ type ProfileRow = {
   profile_completed: boolean | null;
   created_at: string | null;
   mock_card: MockCard | null;
+  role: Role | null;
 };
 
 export default async function HomePage() {
@@ -94,8 +97,14 @@ export default async function HomePage() {
 
               <p className="mt-2 text-sm text-zinc-400">{user.email}</p>
 
-              <div className="mt-4 rounded-full border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-sm text-amber-200">
-                {(typedProfile.plan || "free").toUpperCase()}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                <div className="rounded-full border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-sm text-amber-200">
+                  {(typedProfile.plan || "free").toUpperCase()}
+                </div>
+
+                <div className="rounded-full border border-indigo-400/20 bg-indigo-400/10 px-4 py-2 text-sm text-indigo-200">
+                  {(typedProfile.role || "user").toUpperCase()}
+                </div>
               </div>
             </div>
           </section>
@@ -124,6 +133,7 @@ export default async function HomePage() {
                 label="Plán"
                 value={typedProfile.plan ?? "Nevyplněno"}
               />
+              <InfoCard label="Role" value={typedProfile.role ?? "user"} />
               <InfoCard
                 label="Zaplaceno"
                 value={typedProfile.paid ? "Ano" : "Ne"}

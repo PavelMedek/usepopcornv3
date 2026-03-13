@@ -23,7 +23,7 @@ const loginShowIds = [
 const signupShowIds = [
   431, // Friends
   2993, // Stranger Things
-  66732, // Wednesday
+  15299, // Wednesday
   66, // The Big Bang Theory
   179, // Suits
   305, // Sherlock
