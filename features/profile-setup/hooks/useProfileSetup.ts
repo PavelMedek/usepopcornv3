@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CurrentUser } from "@/features/auth/types";
-import { avatarOptions } from "../constants";
+import { avatarOptions, showOptions } from "../constants";
 import { profileSetupSchema, type ProfileSetupValues } from "../schemas";
 import { updateProfileSetup } from "../services";
 import { getStoredCurrentUser, saveStoredCurrentUser } from "../storage";
@@ -28,6 +28,7 @@ export function useProfileSetup() {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [submitError, setSubmitError] = useState("");
   const [phase, setPhase] = useState<ProfileSetupPhase>("initializing");
+  const [showSearch, setShowSearch] = useState("");
 
   const form = useForm<ProfileSetupValues>({
     resolver: zodResolver(profileSetupSchema),
@@ -67,6 +68,18 @@ export function useProfileSetup() {
     [selectedShows],
   );
 
+  const filteredShows = useMemo(() => {
+    const query = showSearch.trim().toLowerCase();
+
+    if (!query) {
+      return showOptions.slice(0, 6);
+    }
+
+    return showOptions.filter((show) =>
+      show.title.toLowerCase().includes(query),
+    );
+  }, [showSearch]);
+
   const isBusy = phase !== "idle" && phase !== "initializing";
   const isReady = phase !== "initializing";
   const isFormLocked = isBusy;
@@ -99,42 +112,6 @@ export function useProfileSetup() {
       router.push("/home");
     } catch (error) {
       console.error("Profile setup error:", error);
-      setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Nastala chyba při ukládání profilu.",
-      );
-      setPhase("idle");
-    }
-  };
-
-  const onSkip = async () => {
-    if (!user) {
-      router.push("/home");
-      return;
-    }
-
-    try {
-      setSubmitError("");
-      setPhase("skipping-profile");
-
-      const updatedUser = await updateProfileSetup(
-        {
-          id: user.id,
-          username: getFallbackUsername(user),
-          avatar: getFallbackAvatar(user),
-          favoriteShows: getFallbackShows(user),
-        },
-        "/api/users/profile",
-      );
-
-      saveStoredCurrentUser(updatedUser);
-      setUser(updatedUser);
-
-      setPhase("redirecting");
-      router.push("/home");
-    } catch (error) {
-      console.error("Skip profile setup error:", error);
       setSubmitError(
         error instanceof Error
           ? error.message
@@ -180,8 +157,10 @@ export function useProfileSetup() {
     watchedUsername,
     loadingTitle,
     loadingDescription,
+    showSearch,
+    setShowSearch,
+    filteredShows,
     applyToggleShow,
     onSubmit,
-    onSkip,
   };
 }

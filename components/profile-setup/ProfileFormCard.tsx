@@ -10,6 +10,7 @@ import SubmitButton from "@/components/auth/SubmitButton";
 import AuthErrorAlert from "@/components/auth/AuthErrorAlert";
 import AvatarPicker from "./AvatarPicker";
 import ShowPicker, { type ShowOption } from "./ShowPicker";
+import ShowSearchInput from "./ShowSearchInput";
 
 type ProfileFormCardProps = {
   form: UseFormReturn<ProfileSetupValues>;
@@ -20,8 +21,10 @@ type ProfileFormCardProps = {
   submitError?: string;
   disabled?: boolean;
   saveLoading?: boolean;
+  showSearch: string;
+  onShowSearchChange: (value: string) => void;
   onToggleShow: (showId: string) => void;
-  onSkip: MouseEventHandler<HTMLButtonElement>;
+
   onSubmit: FormEventHandler<HTMLFormElement>;
 };
 
@@ -34,8 +37,10 @@ export default function ProfileFormCard({
   submitError,
   disabled,
   saveLoading,
+  showSearch,
+  onShowSearchChange,
   onToggleShow,
-  onSkip,
+
   onSubmit,
 }: ProfileFormCardProps) {
   return (
@@ -94,12 +99,24 @@ export default function ProfileFormCard({
             </span>
           </div>
 
-          <ShowPicker
-            options={showOptions}
-            selected={selectedShows}
-            onToggle={onToggleShow}
+          <ShowSearchInput
+            value={showSearch}
+            onChange={onShowSearchChange}
             disabled={disabled}
           />
+
+          {showOptions.length > 0 ? (
+            <ShowPicker
+              options={showOptions}
+              selected={selectedShows}
+              onToggle={onToggleShow}
+              disabled={disabled}
+            />
+          ) : (
+            <div className="rounded-2xl border border-white/10 bg-zinc-950/40 p-4 text-sm text-zinc-400">
+              Pro zadaný výraz jsme nenašli žádný seriál.
+            </div>
+          )}
 
           {form.formState.errors.favoriteShows && (
             <p className="mt-3 text-sm text-rose-300">
@@ -111,15 +128,6 @@ export default function ProfileFormCard({
         <AuthErrorAlert message={submitError} />
 
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
-          <button
-            type="button"
-            onClick={onSkip}
-            disabled={disabled}
-            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-zinc-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            Přeskočit zatím
-          </button>
-
           <SubmitButton
             loading={saveLoading}
             loadingText="Ukládám"

@@ -5,7 +5,7 @@ import ProfileSummaryCard from "@/components/profile-setup/ProfileSummaryCard";
 import ProfileFormCard from "@/components/profile-setup/ProfileFormCard";
 import AuthLoadingOverlay from "@/components/auth/AuthLoadingOverlay";
 import ProfileSetupPageLoader from "@/components/profile-setup/ProfileSetupPageLoader";
-import { avatarOptions, showOptions } from "@/features/profile-setup/constants";
+import { avatarOptions } from "@/features/profile-setup/constants";
 import { useProfileSetup } from "@/features/profile-setup/hooks/useProfileSetup";
 
 export default function ProfileSetupPageClient() {
@@ -22,9 +22,11 @@ export default function ProfileSetupPageClient() {
     watchedUsername,
     loadingTitle,
     loadingDescription,
+    showSearch,
+    setShowSearch,
+    filteredShows,
     applyToggleShow,
     onSubmit,
-    onSkip,
   } = useProfileSetup();
 
   if (!isReady) {
@@ -47,14 +49,15 @@ export default function ProfileSetupPageClient() {
             <ProfileFormCard
               form={form}
               avatarOptions={avatarOptions}
-              showOptions={showOptions}
+              showOptions={filteredShows}
               selectedShows={selectedShows}
               selectedCount={selectedCount}
               submitError={submitError}
               disabled={isFormLocked}
               saveLoading={phase === "saving-profile"}
+              showSearch={showSearch}
+              onShowSearchChange={setShowSearch}
               onToggleShow={applyToggleShow}
-              onSkip={onSkip}
               onSubmit={form.handleSubmit(onSubmit)}
             />
           </div>
