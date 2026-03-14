@@ -51,6 +51,10 @@ export default async function HomePage() {
     redirect("/signup/profile");
   }
 
+  if (typedProfile.profile_completed !== true) {
+    redirect("/profile");
+  }
+
   const displayName =
     typedProfile.username ||
     [typedProfile.first_name, typedProfile.last_name]

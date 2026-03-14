@@ -99,7 +99,7 @@ export function useSignup() {
       saveCurrentUser(currentUser);
 
       setPhase("redirecting");
-      router.push("/signup/profile");
+      router.push("/profile");
     } catch (error) {
       console.error("Signup error:", error);
       setSubmitError(
